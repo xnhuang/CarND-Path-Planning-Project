@@ -1,6 +1,27 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
-   
+
+## Path planning
+The objective of this project is to build a path planner that creates smooth and safe trajectories for the car to follow. To achieve this goal it's been developed a trajectory planner which implements a Finite State Machine which makes decisions based on sensor fusion and localization data and minimize jerk trajectory. The planner has to produce feasible trajectories which do not provoke any kind of penalties.
+
+## Helper
+This class provides all utility functions including coordinate transformation, unit transformation. Also, a class Vehicle_Prediction is defined to predict other vehicles' behavior based on constant speed assumption. 
+
+## Road
+This class describes other vehicles' behavior and check if other lane are available. To compensate delay of path execution, the class first predict vehicle's state after time delay measured by previous path size (function Road::update_road line 36).
+This class keep tracks of location and speed of vehicles with minimum distance to subject vehicle. A lane is available for lane change if the lane is free and the lane speed is greater than current lane.
+
+## Path
+This class solve jerk minimization trajectory and keep tracks of the costs of constraint violation including jerk, acceleration and so on.
+
+## Vehicle 
+This class solve finite state machine. The finite state machine is a two layer one. The top layer deals with lane keeping and lane change, the logic is once a complete lane change is complete then switch to lane keep. 
+Lane keep can be switched to lane change/lane keep depending on lane availability and lane speed(Vehicle::update_state). Once target lane is determined, the lower level finite state machine determine whether the vehicle 
+follow car following or free flow behavior (Vehicle::realize_action). The terminal state is find through constant acceleration assumption. Desired speed is reducing until a feasible trajectory is achieved. if car is close to lead vehicle then controlled to follow a constant time headway, otherwise try to follow defined speed limit. To deal with sparsity 
+of map points, spline.h is used (Vehicle::get_XY_trajectory), time is used as x axis for spline of x and y individually. 
+
+# Udacity instruction
+
 ### Simulator. You can download the Term3 Simulator BETA which contains the Path Planning Project from the [releases tab](https://github.com/udacity/self-driving-car-sim/releases).
 
 In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 50 m/s^3.
